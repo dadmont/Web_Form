@@ -11,8 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Поля Обьекта внедрения
-        Schema::create('web__forms', function (Blueprint $table) {
+        Schema::create('Organization', function (Blueprint $table) {
             $table->id();
             $table->string('full_name');
             $table->string('short_name');
@@ -23,19 +22,8 @@ return new class extends Migration
             $table->string('ogrn');
             $table->string('email');
             $table->string('phone');
-            
-        
-            // Поля представителей
-            for ($i = 1; $i <= 10; $i++) {
-                $table->string("representative_{$i}_accord")->nullable();
-                $table->string("representative_{$i}_name")->nullable();
-                $table->string("representative_{$i}_position")->nullable();
-                $table->string("representative_{$i}_phone")->nullable();
-                $table->string("representative_{$i}_snils")->nullable();
-                $table->string("representative_{$i}_email")->nullable();
-    }
 
-    $table->timestamps();
+            $table->timestamps(); 
         });
     }
     /**
@@ -43,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('web__forms');
+        Schema::dropIfExists('Organization');
     }
 };
