@@ -5,16 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\Organization;
 use App\Models\Representatives;
 use Illuminate\Http\Request;
+use App\Services\YandexCaptchaService;
 
 class WebFormController extends Controller
 {
+    protected $captchaService;
+    
+    public function __construct(YandexCaptchaService $captchaService)
+    {
+        $this->captchaService = $captchaService;
+    }
+
     public function showForm()
     {
         return view('Main_form');
     }
+     
 
     public function submitForm(Request $request)
     {
+        if (!$this->captchaService->verify(
+            $request->input('smartcaptcha_token'),
+        )) {
+            return back()
+                ->withInput()
+                ->withErrors(['smartcaptcha_token' => 'Пройдите проверку "Я не робот"']);
+        }
+
         $organizationData = $request->validate([
             'full_name' => 'required|string|max:255',
             'short_name' => 'required|string|max:255',

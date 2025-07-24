@@ -18,6 +18,9 @@
             top: 10px;
             right: 10px;
         }
+        .remove-representative[style*="none"] {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -144,6 +147,14 @@
         </div>
     </div>
 </div>
+<div class="mb-4">
+        <div id="smartcaptcha"></div>
+        @error('smartcaptcha_token')
+            <div class="alert alert-danger mt-2">{{ $message }}</div>
+        @enderror
+    </div>
+
+<input type="hidden" name="smartcaptcha_token" id="smartcaptcha-token">
 
 <button type="button" id="add-representative" class="btn btn-secondary mb-4">Добавить представителя</button>
             <button type="submit" class="btn btn-primary">Отправить</button>
@@ -151,94 +162,131 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://smartcaptcha.yandexcloud.net/captcha.js" async defer></script>
     <script>
-    let representativeCount = 1;
-    
-    document.getElementById('add-representative').addEventListener('click', function() {
-        const container = document.getElementById('representatives-container');
-        const newCard = document.createElement('div');
-        newCard.className = 'card mb-4 representative-card';
-        newCard.id = `representative-${representativeCount}`;
-        
-        newCard.innerHTML = `
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2>Данные уполномоченного представителя #${representativeCount + 1}</h2>
-                <button type="button" class="btn btn-danger btn-sm remove-representative" data-id="${representativeCount}">Удалить</button>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label">Согласие на обработку персональных данных</label>
-                    <select class="form-control" name="representatives[${representativeCount}][accord]" required>
-                        <option value="">Выберите</option>
-                        <option value="Согласен">Согласен</option>
-                        <option value="Согласна">Согласна</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">ФИО</label>
-                    <input type="text" class="form-control" name="representatives[${representativeCount}][name]" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Должность</label>
-                    <input type="text" class="form-control" name="representatives[${representativeCount}][position]" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Мобильный телефон</label>
-                    <input type="text" class="form-control" name="representatives[${representativeCount}][phone]" pattern="\\d{10}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">СНИЛС</label>
-                    <input type="text" class="form-control" name="representatives[${representativeCount}][snils]" pattern="\\d{11}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="representatives[${representativeCount}][email]" required>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(newCard);
-        representativeCount++;
+        let representativeCount = 1;
         
         
-        document.querySelectorAll('.remove-representative').forEach(btn => {
-            btn.style.display = 'block';
+        function initSmartCaptcha() {
+            if (typeof window.smartCaptcha !== 'undefined') {
+                window.smartCaptchaWidget = window.smartCaptcha.render('smartcaptcha', {
+                    sitekey: '{{ env("YANDEX_SMARTCAPTCHA_CLIENT_KEY") }}',
+                    callback: function(token) {
+                        document.getElementById('smartcaptcha-token').value = token;
+                    }
         });
-    });
+            } else {
+                setTimeout(initSmartCaptcha, 500);
+            }
+}
 
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-representative')) {
-            const id = e.target.getAttribute('data-id');
-            const card = document.getElementById(`representative-${id}`);
-            card.remove();
+     
+        document.getElementById('add-representative').addEventListener('click', function() {
+            const container = document.getElementById('representatives-container');
+            const newCard = document.createElement('div');
+            newCard.className = 'card mb-4 representative-card';
+            newCard.id = `representative-${representativeCount}`;
             
+            newCard.innerHTML = `
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2>Данные уполномоченного представителя #${representativeCount + 1}</h2>
+                    <button type="button" class="btn btn-danger btn-sm remove-representative" data-id="${representativeCount}">Удалить</button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Согласие на обработку персональных данных</label>
+                        <select class="form-control" name="representatives[${representativeCount}][accord]" required>
+                            <option value="">Выберите</option>
+                            <option value="Согласен">Согласен</option>
+                            <option value="Согласна">Согласна</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">ФИО</label>
+                        <input type="text" class="form-control" name="representatives[${representativeCount}][name]" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Должность</label>
+                        <input type="text" class="form-control" name="representatives[${representativeCount}][position]" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Мобильный телефон</label>
+                        <input type="text" class="form-control" name="representatives[${representativeCount}][phone]" pattern="\\d{10}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">СНИЛС</label>
+                        <input type="text" class="form-control" name="representatives[${representativeCount}][snils]" pattern="\\d{11}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="representatives[${representativeCount}][email]" required>
+                    </div>
+                </div>
+            `;
             
+            container.appendChild(newCard);
+            representativeCount++;
+            
+          
+            document.querySelectorAll('.remove-representative').forEach(btn => {
+                btn.style.display = 'block';
+            });
+        });
+
+  
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-representative')) {
+                const id = e.target.getAttribute('data-id');
+                const card = document.getElementById(`representative-${id}`);
+                if (card) {
+                    card.remove();
+                    updateRepresentatives();
+                }
+            }
+        });
+
+  
+        function updateRepresentatives() {
             const cards = document.querySelectorAll('.representative-card');
             cards.forEach((card, index) => {
                 card.id = `representative-${index}`;
-                card.querySelector('h2').textContent = `Данные уполномоченного представителя #${index + 1}`;
-                card.querySelector('.remove-representative').setAttribute('data-id', index);
+                const title = card.querySelector('h2');
+                const removeBtn = card.querySelector('.remove-representative');
                 
-                const inputs = card.querySelectorAll('[name^="representatives["]');
-                inputs.forEach(input => {
-                    const name = input.getAttribute('name');
-                    const newName = name.replace(/representatives\[\d+\]/, `representatives[${index}]`);
-                    input.setAttribute('name', newName);
+                if (title) title.textContent = `Данные уполномоченного представителя #${index + 1}`;
+                if (removeBtn) removeBtn.setAttribute('data-id', index);
+                
+                card.querySelectorAll('[name^="representatives["]').forEach(input => {
+                    input.name = input.name.replace(/representatives\[\d+\]/, `representatives[${index}]`);
                 });
             });
             
             representativeCount = cards.length;
             
+           
             if (representativeCount === 1) {
-                document.querySelector('.remove-representative').style.display = 'none';
+                const btn = document.querySelector('.remove-representative');
+                if (btn) btn.style.display = 'none';
             }
         }
-    });
-</script>
+
+                 
+            document.addEventListener('DOMContentLoaded', function() {
+                initSmartCaptcha();
+                
+                
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    if (!document.getElementById('smartcaptcha-token').value) {
+                        e.preventDefault();
+                        alert('Пожалуйста, пройдите проверку "Я не робот"');
+                    }
+                });
+});
+    </script>
 </body>
 </html>
