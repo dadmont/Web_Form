@@ -145,6 +145,13 @@
     </div>
 </div>
 
+        <div class="form-group">
+            <label for="captcha">CAPTCHA: {{ $captchaQuestion }}</label>
+            <input type="text" class="form-control" id="captcha" name="captcha" required>
+        </div>
+        <br />  
+         
+
 <button type="button" id="add-representative" class="btn btn-secondary mb-4">Добавить представителя</button>
             <button type="submit" class="btn btn-primary">Отправить</button>
         </form>

@@ -5,16 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Organization;
 use App\Models\Representatives;
 use Illuminate\Http\Request;
+use App\Services\CaptchaService;
 
 class WebFormController extends Controller
 {
+    protected $captchaService;
+
+    public function __construct(CaptchaService $captchaService)
+    {
+        $this->captchaService = $captchaService;
+    }
+
     public function showForm()
     {
-        return view('Main_form');
+        $captchaQuestion = $this->captchaService->generate();
+        return view('Main_form', compact('captchaQuestion'));
     }
+
+        
 
     public function submitForm(Request $request)
     {
+
+        if (!$this->captchaService->verify($request->input('captcha'))) {
+        $newCaptchaQuestion = $this->captchaService->generate();
+        return back()
+            ->withErrors(['captcha' => 'Неверная CAPTCHA'])
+            ->with('captchaQuestion', $newCaptchaQuestion);
+    }
         $organizationData = $request->validate([
             'full_name' => 'required|string|max:255',
             'short_name' => 'required|string|max:255',
