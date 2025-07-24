@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('representatives', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained()->onDelete('cascade');
+            $table->foreignId('Organization_id')->constrained()->onDelete('cascade');
             $table->string("accord");
             $table->string("name");
             $table->string("position");

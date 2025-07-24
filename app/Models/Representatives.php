@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Representatives extends Model
 {
     protected $fillable = [
-        'Organization_id',
+        'organization_id',
         'accord',
         'name',
         'position',
@@ -19,7 +19,7 @@ class Representatives extends Model
 
     public function organization(): BelongsTo
         {
-            return $this->belongsTo(Organization::class);
+            return $this->belongsTo(Organization::class, 'organization_id');
         }
 
 }
