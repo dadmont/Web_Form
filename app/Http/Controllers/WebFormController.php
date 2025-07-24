@@ -22,7 +22,6 @@ class WebFormController extends Controller
         return view('Main_form', compact('captchaQuestion'));
     }
 
-        
 
     public function submitForm(Request $request)
     {

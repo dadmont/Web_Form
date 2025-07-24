@@ -146,9 +146,10 @@
 </div>
 
         <div class="form-group">
-            <label for="captcha">CAPTCHA: {{ $captchaQuestion }}</label>
+            <label for="captcha">CAPTCHA: {{ $captchaQuestion ?? '' }}</label>
             <input type="text" class="form-control" id="captcha" name="captcha" required>
         </div>
+
         <br />  
          
 
