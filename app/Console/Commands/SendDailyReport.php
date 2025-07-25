@@ -60,14 +60,20 @@ class SendDailyReport extends Command
         }
 
 
-        $templatePath = storage_path('app/Reports/template.xlsx');
+        $templatePath = storage_path('app/templates/template.xlsx');
         $reportName = 'Отчет_ДОУ_' . $date->format('Y-m-d') . '.xlsx';
-        $reportPath = storage_path('app/Reports/' . $reportName);
+        $reportPath = storage_path('app/reports/' . $reportName);
+        
+        if (!file_exists(dirname($reportPath))) {
+            mkdir(dirname($reportPath), 0755, true);
+        }
+
         
         if (!copy($templatePath, $reportPath)) {
             throw new \Exception('Не удалось создать копию шаблона');
         }
 
+        
         $spreadsheet = IOFactory::load($reportPath);
         $sheet = $spreadsheet->getSheetByName('ДОУ');
         $this->fillReportData($sheet, $organizations);
