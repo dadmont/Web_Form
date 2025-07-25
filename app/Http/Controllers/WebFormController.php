@@ -30,7 +30,7 @@ class WebFormController extends Controller
         $newCaptchaQuestion = $this->captchaService->generate();
         return back()
             ->withErrors(['captcha' => 'Неверная CAPTCHA'])
-            ->with('captchaQuestion', $newCaptchaQuestion);
+            ->with('captchaQuestion', $request->input('captcha_question'));
     }
         $organizationData = $request->validate([
             'full_name' => 'required|string|max:255',

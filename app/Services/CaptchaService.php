@@ -4,16 +4,35 @@ namespace App\Services;
 
 class CaptchaService
 {
-    public function generate()
+    private $sessionKey = 'captcha_answer';
+
+    public function generate(): string
     {
-        $num1 = rand(1,1);;
-        $num2 = rand(1,1);
-        session(['captcha_answer' => $num1 + $num2]); // Простая примерная проверка, логику и механизм можно усложнить
-        return "Сколько будет $num1 + $num2?";  
+        if (session()->has($this->sessionKey)) {
+            $answer = session($this->sessionKey);
+            return "Сколько будет {$answer['a']} + {$answer['b']}?";
+        }
+
+        $a = rand(1, 10);
+        $b = rand(1, 10);
+        $answer = $a + $b;
+
+        session([$this->sessionKey => ['a' => $a, 'b' => $b, 'answer' => $answer]]);
+
+        return "Сколько будет {$a} + {$b}?";
     }
 
-    public function verify($answer)
+    public function verify(string $userInput): bool
     {
-        return $answer == session('captcha_answer');
+        if (!session()->has($this->sessionKey)) {
+            return false;
+        }
+
+        $captcha = session($this->sessionKey);
+        $isValid = (int)$userInput === $captcha['answer'];
+        
+        session()->forget($this->sessionKey);
+
+        return $isValid;
     }
 }

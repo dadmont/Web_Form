@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -13,17 +12,15 @@ class DailyReportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $filePath;
-
-    public function __construct($filePath)
-    {
-        $this->filePath = $filePath;
-    }
+    public function __construct(
+        public string $filePath,
+        public string $reportDate
+    ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Ежедневный отчет по объектам',
+            subject: "Ежедневный отчет Обьектов внедрения и их представителей за {$this->reportDate}",
         );
     }
 
@@ -31,6 +28,9 @@ class DailyReportMail extends Mailable
     {
         return new Content(
             view: 'emails.daily_report',
+            with: [
+                'reportDate' => $this->reportDate
+            ]
         );
     }
 
@@ -39,7 +39,7 @@ class DailyReportMail extends Mailable
         return [
             [
                 'path' => $this->filePath,
-                'as' => 'daily_report.xlsx',
+                'as' => basename($this->filePath),
                 'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ],
         ];

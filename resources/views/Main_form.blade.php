@@ -37,6 +37,9 @@
         <form method="POST" action="{{ route('form.submit') }}">
             @csrf
 
+             <input type="hidden" name="captcha_question" value="{{ $captchaQuestion }}">
+    
+
             <div class="card mb-4">
                 <div class="card-header">
                     <h2>Данные об объекте внедрения</h2>
@@ -146,9 +149,9 @@
 </div>
 
         <div class="form-group">
-            <label for="captcha">CAPTCHA: {{ $captchaQuestion ?? '' }}</label>
-            <input type="text" class="form-control" id="captcha" name="captcha" required>
-        </div>
+        <label for="captcha">CAPTCHA: {{ $captchaQuestion }}</label>
+        <input type="text" class="form-control" id="captcha" name="captcha" required>
+    </div>
 
         <br />  
          
